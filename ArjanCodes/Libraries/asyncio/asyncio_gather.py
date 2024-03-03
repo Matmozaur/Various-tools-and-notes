@@ -1,7 +1,6 @@
 import asyncio
 from random import randint
 from time import perf_counter
-from typing import Any, Awaitable
 
 from req_http import http_get, http_get_sync
 
