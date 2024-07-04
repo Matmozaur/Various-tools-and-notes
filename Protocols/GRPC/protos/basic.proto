@@ -15,6 +15,8 @@ service Greeter {
 
 	// Both Streaming
 	rpc InteractingHello (stream HelloRequest) returns (stream HelloReply);
+
+	rpc AverageStream (stream AverageRequest) returns (stream AverageReply);
 }
 
 // The request message containing the user's name.
@@ -31,4 +33,12 @@ message HelloReply {
 message DelayedReply {
 	string message = 1;
 	repeated HelloRequest request = 2;
+}
+
+message AverageRequest {
+  repeated float table = 1;
+}
+
+message AverageReply {
+  float avg = 1;
 }

@@ -7,6 +7,11 @@ import basic_pb2_grpc
 
 
 class GreeterServicer(basic_pb2_grpc.GreeterServicer):
+
+    def __init__(self):
+        self.avg = 0
+        self.counter = 0
+
     def SayHello(self, request, context):
         print("SayHello Request Made:")
         print(request)
@@ -44,6 +49,21 @@ class GreeterServicer(basic_pb2_grpc.GreeterServicer):
             hello_reply.message = f"{request.greeting} {request.name}"
 
             yield hello_reply
+
+    def AverageStream(self, request_iterator, context):
+        print(request_iterator)
+        for request in request_iterator:
+            print(request)
+            l = len(request.table)
+            r_avg = sum(request.table) / l
+            new_counter = self.counter + l
+            self.avg = self.avg * (self.counter/new_counter) + r_avg * (l/ new_counter)
+            self.counter = new_counter
+
+            reply = basic_pb2.AverageReply()
+            reply.avg = self.avg
+
+            yield reply
 
 
 def serve():

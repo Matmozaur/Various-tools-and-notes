@@ -16,6 +16,19 @@ def get_client_stream_requests():
         time.sleep(1)
 
 
+def get_client_stream_table_requests():
+    while True:
+        table = input("Please enter a list of numbers : ")
+
+        if table == "END":
+            break
+
+        r = basic_pb2.AverageRequest(table=list(map(float, table.split(','))))
+        print(r)
+        yield r
+        time.sleep(1)
+
+
 def run():
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = basic_pb2_grpc.GreeterStub(channel)
@@ -23,6 +36,7 @@ def run():
         print("2. ParrotSaysHello - Server Side Streaming")
         print("3. ChattyClientSaysHello - Client Side Streaming")
         print("4. InteractingHello - Both Streaming")
+        print("5. Average counter")
         rpc_call = input("Which rpc would you like to make: ")
 
         if rpc_call == "1":
@@ -47,6 +61,13 @@ def run():
 
             for response in responses:
                 print("InteractingHello Response Received: ")
+                print(response)
+
+        elif rpc_call == "5":
+            responses = stub.AverageStream(get_client_stream_table_requests())
+
+            for response in responses:
+                print("Response Received: ")
                 print(response)
 
 
