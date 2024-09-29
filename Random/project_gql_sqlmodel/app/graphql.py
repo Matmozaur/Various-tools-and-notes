@@ -2,10 +2,8 @@ from ariadne import QueryType, MutationType, make_executable_schema, gql
 from ariadne.asgi import GraphQL
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database import get_session
-from app.models import Book
 from app.database import async_session
-
+from app.models import Book
 
 # Define type definitions (schema)
 type_defs = gql("""
