@@ -13,16 +13,20 @@ if __name__ == '__main__':
     lib.add.restype = ctypes.c_int
 
     start = time.time()
-    for i in range(10**6):
+    for i in range(10**7):
         # Call the C functions
         result = lib.add(i, 7)
     print("Call c each time:", time.time() - start)
 
     start = time.time()
-    for i in range(10**6):
+    for i in range(10**7):
         result = i+7
     print("All in python:", time.time() - start)
 
     start = time.time()
-    lib.add_k_x_times(10**6, 7)
+    lib.add_k_x_times(10**7, 7)
     print("Call c one time:", time.time() - start)
+
+    start = time.time()
+    lib.add_k_x_times_parallel(10**7, 7)
+    print("Call c one time parallel:", time.time() - start)
