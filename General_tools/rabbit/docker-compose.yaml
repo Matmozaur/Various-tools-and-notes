@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ (AMQP)
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  producer:
+    build: ./producer
+    depends_on:
+      - rabbitmq
+    command: sh -c "sleep 10 && python main.py"
+
+  service1:
+    build: ./service1
+    depends_on:
+      - rabbitmq
+    command: sh -c "sleep 10 && python main.py"
+
+  service2:
+    build: ./service2
+    depends_on:
+      - rabbitmq
+    command: sh -c "sleep 10 && python main.py"
