@@ -10,10 +10,13 @@ int add(int a, int b) {
     return a + b;
 }
 
-void add_k_x_times(int n, int k) {
+
+int add_k_x_times(int n, int k) {
+    int a = 0;
     for (int i = 0; i < n; i++) {
-        int a = i + k;
+        a = (a + i) % k;
     }
+    return a;
 }
 
 
@@ -27,32 +30,36 @@ typedef struct {
 void* add_k_x_times_thread(void* arg) {
     ThreadData* data = (ThreadData*)arg;
 
+    int a = 0;
     for (int i = data->start; i < data->end; i++) {
-        int a = i + data->k;
+        a = (a + i) % data->k;
     }
 
-    return NULL;
+    int* result = malloc(sizeof(int));
+    *result = a;
+    return result;
 }
 
-void add_k_x_times_parallel(int n, int k) {
+// Parallel version: divides work into chunks, sums results
+int add_k_x_times_parallel(int n, int k) {
     pthread_t threads[NUM_THREADS];
     ThreadData thread_data[NUM_THREADS];
-
-    int chunk_size = n / NUM_THREADS; // Divide the work among threads
+    int chunk_size = n / NUM_THREADS;
+    int total = 0;
 
     for (int t = 0; t < NUM_THREADS; t++) {
-        // Calculate start and end indices for each thread
         thread_data[t].start = t * chunk_size;
         thread_data[t].end = (t == NUM_THREADS - 1) ? n : (t + 1) * chunk_size;
         thread_data[t].k = k;
-
-        // Create the thread
         pthread_create(&threads[t], NULL, add_k_x_times_thread, &thread_data[t]);
     }
 
-    // Wait for all threads to complete
     for (int t = 0; t < NUM_THREADS; t++) {
-        pthread_join(threads[t], NULL);
+        int* result;
+        pthread_join(threads[t], (void**)&result);
+        total += *result;
+        free(result);
     }
+    return total;
 }
 

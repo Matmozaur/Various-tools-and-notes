@@ -24,9 +24,17 @@ if __name__ == '__main__':
     print("All in python:", time.time() - start)
 
     start = time.time()
-    lib.add_k_x_times(10**7, 7)
+    x = lib.add_k_x_times(10**7, 7)
     print("Call c one time:", time.time() - start)
 
     start = time.time()
     lib.add_k_x_times_parallel(10**7, 7)
     print("Call c one time parallel:", time.time() - start)
+
+    start = time.time()
+    lib.add_k_x_times(10**10, 7)
+    print("Call c one time (x1000):", time.time() - start)
+
+    start = time.time()
+    lib.add_k_x_times_parallel(10**10, 7)
+    print("Call c one time parallel (x1000):", time.time() - start)
