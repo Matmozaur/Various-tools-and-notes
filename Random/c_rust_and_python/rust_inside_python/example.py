@@ -19,8 +19,9 @@ for i in range(10**7):
 print("Call Rust each time:", time.time() - start)
 
 start = time.time()
+result = 0
 for i in range(10**7):
-    result = i+7
+    result = (result + i) % 7
 print("All in python:", time.time() - start)
 
 start = time.time()
