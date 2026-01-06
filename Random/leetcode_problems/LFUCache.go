@@ -46,7 +46,7 @@ type Node struct {
 	k, v, freq int
 }
 
-func Constructor(capacity int) LFUCache {
+func ConstructorLFUCache(capacity int) LFUCache {
 	return LFUCache{
 		capacity: capacity,
 		minFreq:  0,
