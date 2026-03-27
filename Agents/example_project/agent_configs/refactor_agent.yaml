@@ -1,0 +1,204 @@
+agent:
+  name: "refactor_agent"
+  type: "refactor"
+  model: "claude-sonnet-4.5"
+  version: "1.0.0"
+  description: "Intelligent code refactoring agent for improving code quality and maintainability"
+  
+  parameters:
+    temperature: 0.4        # Moderate-low for consistent refactoring
+    max_tokens: 5000
+    top_p: 0.9
+    
+  capabilities:
+    - extract_method
+    - extract_class
+    - rename_variable
+    - simplify_conditionals
+    - remove_duplication
+    - introduce_parameter_object
+    - replace_magic_numbers
+    - decompose_conditional
+    
+  refactoring_types:
+    code_smells:
+      enabled: true
+      detect:
+        - long_method
+        - large_class
+        - long_parameter_list
+        - duplicate_code
+        - data_clumps
+        - primitive_obsession
+        - switch_statements
+        - lazy_class
+        - speculative_generality
+        
+    design_patterns:
+      enabled: true
+      suggest:
+        - strategy
+        - factory
+        - observer
+        - decorator
+        - adapter
+        - singleton
+        - repository
+        - dependency_injection
+        
+    performance:
+      enabled: true
+      optimizations:
+        - loop_optimization
+        - caching
+        - lazy_loading
+        - database_query_optimization
+        - algorithm_improvement
+        
+    modernization:
+      enabled: true
+      language_features:
+        python:
+          - use_type_hints
+          - use_dataclasses
+          - use_pathlib
+          - use_f_strings
+          - use_walrus_operator
+          - use_structural_pattern_matching
+        javascript:
+          - use_arrow_functions
+          - use_async_await
+          - use_destructuring
+          - use_spread_operator
+          - use_optional_chaining
+          
+  constraints:
+    max_iterations: 5
+    timeout_seconds: 120
+    max_refactorings_per_run: 10
+    safety_level: "conservative"  # or "moderate", "aggressive"
+    
+  safety:
+    preserve_behavior: true
+    require_tests: true           # Require tests before refactoring
+    run_tests_after: true         # Run tests after refactoring
+    create_backup: true
+    
+  prompts:
+    system: "prompts/system_prompts/refactor_agent_system.md"
+    templates:
+      - "prompts/task_prompts/extract_method.md"
+      - "prompts/task_prompts/simplify_code.md"
+      - "prompts/task_prompts/design_pattern.md"
+      
+  output:
+    format: "structured"
+    include_explanation: true
+    include_before_after: true
+    include_impact_analysis: true
+    confidence_threshold: 0.7      # Only suggest refactorings with >70% confidence
+    
+  tools:
+    - name: "read_file"
+      enabled: true
+    - name: "write_file"
+      enabled: true
+    - name: "parse_ast"
+      enabled: true
+    - name: "run_tests"
+      enabled: true
+    - name: "analyze_dependencies"
+      enabled: true
+    - name: "calculate_metrics"
+      enabled: true
+      
+  metrics:
+    track:
+      - cyclomatic_complexity
+      - lines_of_code
+      - maintainability_index
+      - code_duplication
+      - test_coverage
+      
+    thresholds:
+      cyclomatic_complexity: 10
+      method_length: 50
+      class_length: 300
+      parameter_count: 5
+      
+  analysis:
+    scope:
+      - function_level
+      - class_level
+      - module_level
+      - package_level
+      
+    consider:
+      - readability
+      - maintainability
+      - testability
+      - performance
+      - security
+      
+  decision_criteria:
+    refactor_if:
+      complexity_above: 10
+      duplication_above: 0.05      # 5% duplication
+      method_lines_above: 50
+      class_lines_above: 300
+      
+    priority:
+      - critical_security_issues
+      - high_complexity
+      - code_duplication
+      - performance_bottlenecks
+      - readability_issues
+      
+  review_process:
+    steps:
+      - analyze_code
+      - identify_refactoring_opportunities
+      - assess_impact
+      - generate_refactored_code
+      - verify_behavior_preservation
+      - run_tests
+      - generate_report
+      
+    approval:
+      require_human_review: true
+      auto_apply_threshold: 0.95   # Only auto-apply if 95%+ confidence
+      
+  principles:
+    follow:
+      - SOLID
+      - DRY
+      - KISS
+      - YAGNI
+      - separation_of_concerns
+      - single_responsibility
+      
+  integrations:
+    version_control:
+      enabled: true
+      create_branch: true
+      branch_prefix: "refactor/"
+      commit_message_template: "refactor: {description}"
+      
+    code_review:
+      enabled: true
+      create_pull_request: false
+      
+    ci_cd:
+      enabled: true
+      run_tests: true
+      check_coverage: true
+      
+  reporting:
+    include:
+      - refactoring_summary
+      - before_after_comparison
+      - impact_analysis
+      - test_results
+      - metrics_improvement
+      
+    format: "markdown"

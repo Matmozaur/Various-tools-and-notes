@@ -1,0 +1,167 @@
+agent:
+  name: "documentation_agent"
+  type: "documentation"
+  model: "claude-sonnet-4.5"
+  version: "1.0.0"
+  description: "Automated documentation generation and maintenance agent"
+  
+  parameters:
+    temperature: 0.5        # Moderate temperature for creative but accurate docs
+    max_tokens: 6000        # Longer responses for comprehensive documentation
+    top_p: 0.9
+    
+  capabilities:
+    - api_documentation
+    - readme_generation
+    - inline_comments
+    - diagram_generation
+    - tutorial_creation
+    - changelog_updates
+    
+  documentation_types:
+    api_docs:
+      enabled: true
+      format: "markdown"     # or "restructuredtext", "openapi"
+      include_examples: true
+      include_schemas: true
+      style_guide: "google"  # or "numpy", "sphinx"
+      
+    readme:
+      enabled: true
+      sections:
+        - overview
+        - installation
+        - quick_start
+        - usage_examples
+        - api_reference
+        - contributing
+        - license
+      include_badges: true
+      include_toc: true
+      
+    inline_docs:
+      enabled: true
+      docstring_style: "google"
+      include_types: true
+      include_examples: true
+      min_function_lines: 3   # Only document functions with 3+ lines
+      
+    diagrams:
+      enabled: true
+      formats:
+        - mermaid
+        - plantuml
+      types:
+        - architecture
+        - sequence
+        - class
+        - flowchart
+        
+  constraints:
+    max_iterations: 2
+    timeout_seconds: 90
+    max_files_per_run: 20
+    
+  prompts:
+    system: "prompts/system_prompts/documentation_agent_system.md"
+    templates:
+      - "prompts/task_prompts/api_docs.md"
+      - "prompts/task_prompts/readme_template.md"
+      - "prompts/task_prompts/diagram_generation.md"
+      
+  output:
+    format: "markdown"
+    include_code_samples: true
+    code_sample_language: "auto"  # Detect from context
+    max_example_lines: 30
+    
+  tools:
+    - name: "read_file"
+      enabled: true
+    - name: "write_file"
+      enabled: true
+    - name: "list_directory"
+      enabled: true
+    - name: "parse_ast"
+      enabled: true
+    - name: "generate_diagram"
+      enabled: true
+      
+  analysis:
+    extract_from_code:
+      - function_signatures
+      - class_definitions
+      - type_hints
+      - docstrings
+      - imports
+      
+    infer_from_usage:
+      - parameter_types
+      - return_types
+      - exceptions
+      - dependencies
+      
+  style:
+    tone: "professional"      # or "casual", "technical"
+    audience: "intermediate"  # or "beginner", "advanced"
+    verbosity: "moderate"     # or "concise", "detailed"
+    
+  quality_checks:
+    - grammar_and_spelling
+    - code_sample_validity
+    - link_validation
+    - consistent_terminology
+    - proper_formatting
+    
+  templates:
+    function_doc: |
+      """
+      {brief_description}
+      
+      {detailed_description}
+      
+      Args:
+          {parameters}
+      
+      Returns:
+          {return_description}
+      
+      Raises:
+          {exceptions}
+      
+      Example:
+          >>> {example_usage}
+      """
+      
+    class_doc: |
+      """
+      {brief_description}
+      
+      {detailed_description}
+      
+      Attributes:
+          {attributes}
+      
+      Example:
+          >>> {example_usage}
+      """
+      
+  integrations:
+    version_control:
+      enabled: true
+      auto_commit: false
+      commit_message_template: "docs: {description}"
+      
+    static_site:
+      enabled: false
+      generator: "mkdocs"     # or "sphinx", "docusaurus"
+      
+    api_spec:
+      enabled: true
+      format: "openapi-3.0"
+      
+  maintenance:
+    check_staleness: true
+    stale_threshold_days: 90
+    update_on_code_change: true
+    preserve_custom_sections: true

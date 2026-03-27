@@ -1,0 +1,255 @@
+agent:
+  name: "test_writer"
+  type: "test"
+  model: "claude-sonnet-4.5"
+  version: "1.0.0"
+  description: "Automated test generation agent for comprehensive test coverage"
+  
+  parameters:
+    temperature: 0.6        # Moderate temperature for diverse test cases
+    max_tokens: 5000
+    top_p: 0.9
+    
+  capabilities:
+    - unit_test_generation
+    - integration_test_generation
+    - edge_case_identification
+    - property_based_testing
+    - mock_generation
+    - fixture_creation
+    - test_coverage_analysis
+    
+  test_types:
+    unit:
+      enabled: true
+      coverage_target: 80
+      focus:
+        - happy_path
+        - edge_cases
+        - error_conditions
+        - boundary_values
+        
+    integration:
+      enabled: true
+      focus:
+        - component_interaction
+        - data_flow
+        - external_dependencies
+        
+    property_based:
+      enabled: false
+      framework: "hypothesis"  # or "fast-check" for JavaScript
+      
+    end_to_end:
+      enabled: false
+      framework: "pytest-playwright"  # or "cypress"
+      
+  frameworks:
+    python:
+      primary: "pytest"
+      plugins:
+        - pytest-asyncio
+        - pytest-mock
+        - pytest-cov
+        - pytest-benchmark
+        
+    javascript:
+      primary: "jest"
+      plugins:
+        - "@testing-library/react"
+        
+  constraints:
+    max_iterations: 3
+    timeout_seconds: 90
+    max_tests_per_function: 10
+    max_files_per_run: 15
+    
+  test_generation_strategy:
+    analyze:
+      - function_signature
+      - type_hints
+      - docstrings
+      - implementation_logic
+      - exception_handling
+      - dependencies
+      
+    generate_for:
+      - public_methods
+      - critical_paths
+      - error_handling
+      - edge_cases
+      - integration_points
+      
+    skip:
+      - private_methods      # unless complex
+      - simple_getters_setters
+      - generated_code
+      - deprecated_functions
+      
+  prompts:
+    system: "prompts/system_prompts/test_writer_system.md"
+    templates:
+      - "prompts/task_prompts/unit_test.md"
+      - "prompts/task_prompts/integration_test.md"
+      
+  output:
+    format: "pytest"         # or "unittest", "jest"
+    file_naming: "{module}_test.py"  # or "test_{module}.py"
+    organization: "mirror"   # Mirror source structure in tests/
+    
+  tools:
+    - name: "read_file"
+      enabled: true
+    - name: "write_file"
+      enabled: true
+    - name: "parse_ast"
+      enabled: true
+    - name: "run_tests"
+      enabled: true
+    - name: "coverage_report"
+      enabled: true
+    - name: "generate_mocks"
+      enabled: true
+      
+  test_patterns:
+    unit_test_template: |
+      def test_{function_name}_{scenario}():
+          """Test {function_name} {scenario}."""
+          # Arrange
+          {setup}
+          
+          # Act
+          result = {function_call}
+          
+          # Assert
+          assert {assertion}
+          
+    async_test_template: |
+      @pytest.mark.asyncio
+      async def test_{function_name}_{scenario}():
+          """Test {function_name} {scenario}."""
+          # Arrange
+          {setup}
+          
+          # Act
+          result = await {function_call}
+          
+          # Assert
+          assert {assertion}
+          
+    parametrized_test_template: |
+      @pytest.mark.parametrize("{params}", [
+          {test_cases}
+      ])
+      def test_{function_name}_{scenario}({params}):
+          """Test {function_name} with various inputs."""
+          # Act
+          result = {function_call}
+          
+          # Assert
+          assert {assertion}
+          
+  coverage:
+    target_percentage: 80
+    track:
+      - line_coverage
+      - branch_coverage
+      - function_coverage
+      
+    report_format: "html"    # or "xml", "json", "terminal"
+    
+  assertions:
+    prefer:
+      - specific_assertions  # assertEqual vs assertTrue
+      - custom_messages
+      - multiple_asserts     # When appropriate
+      
+    avoid:
+      - bare_assertions
+      - overly_broad_exceptions
+      - testing_implementation_details
+      
+  mocking:
+    strategy: "auto"         # Automatically determine what to mock
+    mock_external:
+      - api_calls
+      - database_queries
+      - file_system
+      - network_requests
+      - time_dependencies
+      
+    mock_internal:
+      - complex_dependencies
+      - slow_operations
+      
+  fixtures:
+    auto_generate: true
+    scope: "function"        # or "module", "session"
+    sharing: "allow"         # Allow fixture reuse across tests
+    
+  edge_cases:
+    consider:
+      - null_values
+      - empty_collections
+      - zero_values
+      - negative_numbers
+      - boundary_values
+      - large_inputs
+      - special_characters
+      - unicode_strings
+      - concurrent_access
+      
+  error_testing:
+    test_exceptions: true
+    test_validation: true
+    test_error_messages: true
+    
+  quality_checks:
+    naming_convention: "test_{function}_{scenario}"
+    test_independence: true   # Tests should not depend on each other
+    test_determinism: true    # Tests should be deterministic
+    no_side_effects: true     # Tests should clean up after themselves
+    
+  documentation:
+    include_docstrings: true
+    explain_setup: true
+    explain_assertions: true
+    include_examples: false   # Rarely needed in tests
+    
+  integrations:
+    ci_cd:
+      enabled: true
+      run_on_commit: true
+      fail_below_coverage: 70
+      
+    coverage_tools:
+      enabled: true
+      tool: "coverage.py"     # or "istanbul" for JS
+      upload_to: "codecov"    # or "coveralls"
+      
+    mutation_testing:
+      enabled: false
+      tool: "mutmut"          # or "stryker"
+      
+  best_practices:
+    follow:
+      - arrange_act_assert
+      - one_assertion_per_test  # Guideline, not strict rule
+      - descriptive_test_names
+      - test_one_thing
+      - independent_tests
+      - fast_tests
+      
+  maintenance:
+    update_on_code_change: true
+    remove_obsolete_tests: true
+    refactor_duplicate_setup: true
+    
+  reporting:
+    include:
+      - tests_generated
+      - coverage_achieved
+      - edge_cases_covered
+      - execution_time
+      
+    format: "markdown"

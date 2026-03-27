@@ -1,0 +1,122 @@
+agent:
+  name: "code_reviewer"
+  type: "review"
+  model: "claude-sonnet-4.5"
+  version: "1.0.0"
+  description: "Automated code review agent focusing on security, performance, and best practices"
+  
+  parameters:
+    temperature: 0.3        # Low temperature for consistent, focused reviews
+    max_tokens: 4000
+    top_p: 0.9
+    
+  capabilities:
+    - static_analysis
+    - security_review
+    - performance_analysis
+    - style_checking
+    - best_practices
+    - dependency_analysis
+    
+  focus_areas:
+    security:
+      enabled: true
+      severity_threshold: "medium"
+      checks:
+        - sql_injection
+        - xss_vulnerabilities
+        - hardcoded_secrets
+        - insecure_random
+        - path_traversal
+        
+    performance:
+      enabled: true
+      checks:
+        - n_plus_one_queries
+        - inefficient_loops
+        - memory_leaks
+        - blocking_operations
+        
+    code_quality:
+      enabled: true
+      checks:
+        - code_smells
+        - duplicate_code
+        - complex_functions
+        - long_parameter_lists
+        - magic_numbers
+        
+    best_practices:
+      enabled: true
+      language_specific:
+        python:
+          - pep8_compliance
+          - type_hints
+          - docstrings
+          - exception_handling
+        javascript:
+          - eslint_rules
+          - async_await_usage
+          - error_handling
+        
+  constraints:
+    max_iterations: 3
+    timeout_seconds: 60
+    max_files_per_review: 10
+    max_lines_per_file: 1000
+    
+  prompts:
+    system: "prompts/system_prompts/code_reviewer_system.md"
+    templates:
+      - "prompts/task_prompts/security_review.md"
+      - "prompts/task_prompts/performance_review.md"
+      
+  output:
+    format: "structured"      # or "markdown", "json"
+    include_examples: true
+    include_suggestions: true
+    severity_levels:
+      - critical
+      - error
+      - warning
+      - info
+      
+  tools:
+    - name: "read_file"
+      enabled: true
+    - name: "list_directory"
+      enabled: true
+    - name: "get_git_diff"
+      enabled: true
+    - name: "run_linter"
+      enabled: true
+      
+  filters:
+    ignore_patterns:
+      - "*.min.js"
+      - "*.map"
+      - "node_modules/**"
+      - "venv/**"
+      - "__pycache__/**"
+      - "*.pyc"
+      
+    focus_files:
+      # Only review these patterns if specified
+      - "src/**/*.py"
+      - "lib/**/*.js"
+      
+  integrations:
+    git:
+      enabled: true
+      review_diff_only: true     # Only review changed lines
+      
+    ci_cd:
+      fail_on_critical: true
+      fail_on_error: true
+      fail_on_warning: false
+      
+    notifications:
+      enabled: false
+      channels:
+        - slack
+        - email

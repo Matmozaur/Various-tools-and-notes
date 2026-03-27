@@ -1,0 +1,532 @@
+# Cursor IDE Rules for AI Agent Project
+
+You are an expert AI coding assistant working on an AI agent example project. Your role is to help developers build, test, and document AI agents.
+
+## Project Overview
+
+This project demonstrates modern AI agent patterns including:
+- Code review agents
+- Documentation agents  
+- Refactoring agents
+- Test writing agents
+- Multi-agent coordination
+
+## Core Principles
+
+1. **Type Safety First**: Always use Python type hints
+2. **Error Handling**: Wrap all API calls in try-except with retries
+3. **Documentation**: Every public function needs a docstring
+4. **Testing**: Generate tests alongside implementation
+5. **Cost Awareness**: Consider token usage and API costs
+6. **Security**: Never expose secrets, always validate inputs
+
+## Code Style
+
+### Python
+
+- Use Python 3.11+ features
+- Type hints are mandatory
+- Prefer dataclasses for data structures
+- Use async/await for I/O operations
+- Follow PEP 8 with line length of 100
+- Use descriptive variable names
+
+### Example Pattern
+
+```python
+from dataclasses import dataclass
+from typing import Any
+import logging
+
+@dataclass
+class AgentConfig:
+    """Configuration for an AI agent."""
+    name: str
+    model: str
+    temperature: float = 0.7
+    max_tokens: int = 4000
+
+class Agent:
+    """Base class for AI agents."""
+    
+    def __init__(self, config: AgentConfig):
+        self.config = config
+        self.logger = logging.getLogger(f"{__name__}.{config.name}")
+        self.client = self._init_client()
+    
+    def _init_client(self) -> Any:
+        """Initialize the API client."""
+        # Implementation
+        pass
+    
+    async def execute(self, task: str) -> str:
+        """
+        Execute a task using the agent.
+        
+        Args:
+            task: Description of the task to perform
+            
+        Returns:
+            Result of the task execution
+            
+        Raises:
+            APIError: If the API call fails
+        """
+        try:
+            self.logger.info(f"Executing task: {task[:50]}...")
+            result = await self._call_api(task)
+            self.logger.info("Task completed successfully")
+            return result
+        except Exception as e:
+            self.logger.error(f"Task failed: {e}")
+            raise
+```
+
+## When Suggesting Code
+
+### Always Include
+
+1. **Imports**: Suggest all needed imports at the top
+2. **Type Hints**: Add type annotations to all functions
+3. **Docstrings**: Google-style docstrings for public functions
+4. **Error Handling**: Try-except blocks for external calls
+5. **Logging**: Appropriate log statements
+6. **Comments**: Explain complex logic
+
+### Never Include
+
+1. Hardcoded API keys or secrets
+2. Unvalidated user input execution
+3. Code without error handling for API calls
+4. Functions without type hints
+5. Public functions without docstrings
+
+## Agent-Specific Rules
+
+### When creating agents:
+
+- Inherit from a base Agent class when possible
+- Implement `execute()` method as the main entry point
+- Use `_init_client()` for API client setup
+- Use `_init_tools()` for tool definitions
+- Prefix private methods with underscore
+
+### When creating prompts:
+
+- Store in `prompts/` directory
+- Use .md files for system prompts
+- Include examples in prompts
+- Be specific about output format
+- Version control prompt changes
+
+### When creating configs:
+
+- Use YAML format
+- Store in `agent_configs/` directory
+- Include all agent parameters
+- Document each configuration option
+- Provide sensible defaults
+
+## File Organization
+
+```
+agents/              # Agent implementations
+agent_configs/       # YAML configuration files
+prompts/
+  system_prompts/    # System prompts for agents
+  task_prompts/      # Task-specific prompts
+examples/            # Usage examples
+tests/               # Test files
+```
+
+## Common Patterns to Use
+
+### 1. Retry with Backoff
+
+```python
+import backoff
+from anthropic import RateLimitError
+
+@backoff.on_exception(backoff.expo, RateLimitError, max_tries=3)
+async def call_api(self, prompt: str) -> str:
+    response = await self.client.messages.create(
+        model=self.config.model,
+        max_tokens=self.config.max_tokens,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text
+```
+
+### 2. Token Counting
+
+```python
+import tiktoken
+
+def count_tokens(text: str) -> int:
+    """Count tokens in text using cl100k_base encoding."""
+    encoding = tiktoken.get_encoding("cl100k_base")
+    return len(encoding.encode(text))
+```
+
+### 3. Result Objects
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class Severity(Enum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
+
+@dataclass
+class Issue:
+    severity: Severity
+    message: str
+    line_number: int | None = None
+    suggestion: str | None = None
+
+@dataclass
+class ReviewResult:
+    issues: list[Issue]
+    summary: str
+    success: bool
+```
+
+### 4. Configuration Loading
+
+```python
+import yaml
+from pathlib import Path
+
+def load_config(config_name: str) -> dict[str, Any]:
+    """Load agent configuration from YAML file."""
+    config_path = Path("agent_configs") / f"{config_name}.yaml"
+    with open(config_path) as f:
+        return yaml.safe_load(f)
+```
+
+### 5. Agent Factory
+
+```python
+from typing import Type
+
+class AgentFactory:
+    """Factory for creating agents."""
+    
+    _agents: dict[str, Type[Agent]] = {}
+    
+    @classmethod
+    def register(cls, name: str, agent_class: Type[Agent]):
+        cls._agents[name] = agent_class
+    
+    @classmethod
+    def create(cls, name: str, config: dict[str, Any]) -> Agent:
+        if name not in cls._agents:
+            raise ValueError(f"Unknown agent type: {name}")
+        return cls._agents[name](config)
+```
+
+## Testing Patterns
+
+### Unit Tests
+
+```python
+import pytest
+from unittest.mock import Mock, AsyncMock, patch
+
+class TestCodeReviewAgent:
+    @pytest.fixture
+    def agent(self):
+        config = AgentConfig(
+            name="test_agent",
+            model="claude-sonnet-4.5"
+        )
+        return CodeReviewAgent(config)
+    
+    @pytest.mark.asyncio
+    async def test_execute_success(self, agent):
+        with patch.object(agent, '_call_api', new_callable=AsyncMock) as mock:
+            mock.return_value = "Review complete"
+            result = await agent.execute("test code")
+            assert result == "Review complete"
+    
+    @pytest.mark.asyncio
+    async def test_execute_handles_errors(self, agent):
+        with patch.object(agent, '_call_api', new_callable=AsyncMock) as mock:
+            mock.side_effect = Exception("API Error")
+            with pytest.raises(Exception):
+                await agent.execute("test code")
+```
+
+### Integration Tests
+
+```python
+@pytest.mark.integration
+@pytest.mark.asyncio
+async def test_agent_chain():
+    """Test multiple agents working together."""
+    agents = [
+        CodeReviewAgent(review_config),
+        RefactoringAgent(refactor_config),
+        TestWriterAgent(test_config)
+    ]
+    
+    chain = AgentChain(agents)
+    result = await chain.process("def hello(): pass")
+    
+    assert result.review_completed
+    assert result.refactoring_suggestions
+    assert result.tests_generated
+```
+
+## Documentation Standards
+
+### Markdown Files
+
+- Use proper heading hierarchy (# ## ###)
+- Include table of contents for docs >200 lines
+- Add code examples with language tags
+- Use Mermaid for diagrams
+- Link to related documents
+
+### Code Comments
+
+```python
+# Good: Explains WHY
+# Use exponential backoff to handle rate limits gracefully
+@backoff.on_exception(backoff.expo, RateLimitError, max_tries=3)
+
+# Bad: Explains WHAT (code already shows this)
+# Call the API
+response = call_api()
+```
+
+### Docstrings
+
+```python
+def process_code(
+    code: str,
+    language: str,
+    context: dict[str, Any] | None = None
+) -> ProcessResult:
+    """
+    Process code using the configured agent.
+    
+    This function analyzes the provided code, considering the language
+    and any additional context. It returns detailed results including
+    issues found and suggestions for improvement.
+    
+    Args:
+        code: Source code to process
+        language: Programming language (e.g., 'python', 'javascript')
+        context: Optional context dict with keys:
+            - file_path: Path to the source file
+            - project_info: Project metadata
+            - custom_rules: Additional analysis rules
+    
+    Returns:
+        ProcessResult containing:
+            - issues: List of identified issues
+            - suggestions: Improvement suggestions
+            - metrics: Code quality metrics
+    
+    Raises:
+        ValueError: If language is not supported
+        APIError: If the backend service fails
+        
+    Example:
+        >>> agent = CodeReviewAgent(config)
+        >>> result = agent.process_code(
+        ...     code="def foo(): pass",
+        ...     language="python"
+        ... )
+        >>> print(result.issues)
+        [Issue(severity=WARNING, message="Missing docstring")]
+    """
+    pass
+```
+
+## Mermaid Diagrams
+
+Use Mermaid for architecture diagrams:
+
+```markdown
+## Architecture
+
+```mermaid
+graph TD
+    A[User Request] --> B{Agent Router}
+    B -->|Code Review| C[Review Agent]
+    B -->|Documentation| D[Doc Agent]
+    B -->|Refactoring| E[Refactor Agent]
+    
+    C --> F[Claude API]
+    D --> F
+    E --> F
+    
+    F --> G[Result Aggregator]
+    G --> H[User Response]
+```
+```
+
+## Environment Variables
+
+```python
+# Always use environment variables for secrets
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+if not ANTHROPIC_API_KEY:
+    raise ValueError("ANTHROPIC_API_KEY not set")
+```
+
+## Logging Setup
+
+```python
+import logging
+import sys
+
+def setup_logging(level: str = "INFO") -> logging.Logger:
+    """Configure logging for the application."""
+    logging.basicConfig(
+        level=getattr(logging, level.upper()),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler("agent.log")
+        ]
+    )
+    return logging.getLogger(__name__)
+```
+
+## Performance
+
+- Use async/await for I/O operations
+- Implement caching for repeated queries
+- Batch similar requests when possible
+- Monitor token usage
+- Profile slow operations
+
+```python
+import asyncio
+from functools import lru_cache
+import time
+
+# Caching
+@lru_cache(maxsize=100)
+def expensive_operation(input: str) -> str:
+    # Cached result
+    return result
+
+# Async batch processing
+async def process_batch(items: list[str]) -> list[str]:
+    tasks = [process_item(item) for item in items]
+    return await asyncio.gather(*tasks)
+
+# Performance monitoring
+def timed(func):
+    async def wrapper(*args, **kwargs):
+        start = time.time()
+        result = await func(*args, **kwargs)
+        duration = time.time() - start
+        logging.info(f"{func.__name__} took {duration:.2f}s")
+        return result
+    return wrapper
+```
+
+## Security Checklist
+
+Before suggesting code, verify:
+
+- [ ] No hardcoded secrets
+- [ ] Input validation present
+- [ ] Proper error messages (no sensitive data)
+- [ ] Rate limiting implemented
+- [ ] Authentication/authorization checks
+- [ ] SQL injection prevention (if applicable)
+- [ ] XSS prevention (if applicable)
+- [ ] Secure random generation (if applicable)
+
+## Helpful Shortcuts
+
+When user asks to:
+
+- "Create an agent" → Use the base Agent pattern above
+- "Add tests" → Use pytest with async support
+- "Add logging" → Use the logging setup pattern
+- "Add config" → Create YAML in agent_configs/
+- "Add prompt" → Create .md in prompts/
+- "Add docs" → Use the markdown template with TOC
+
+## Model Selection Guide
+
+Suggest model based on task:
+
+- **claude-haiku-4**: Simple tasks, quick feedback, syntax checks
+- **claude-sonnet-4.5**: General development, code review, documentation
+- **claude-opus-4**: Complex reasoning, architecture decisions, refactoring
+
+## Common Mistakes to Avoid
+
+1. Forgetting async/await in API calls
+2. Not handling rate limits
+3. Missing type hints
+4. No docstrings on public functions
+5. Hardcoding configuration values
+6. Not logging errors
+7. No input validation
+8. Infinite retry loops
+9. Not tracking token usage
+10. Exposing sensitive data in logs
+
+## Quick Reference
+
+### Import Organization
+
+```python
+# Standard library
+import asyncio
+import logging
+from dataclasses import dataclass
+from typing import Any
+
+# Third-party
+import yaml
+from anthropic import AsyncAnthropic
+import backoff
+
+# Local
+from .base import Agent
+from .config import load_config
+```
+
+### Common Anthropic API Call
+
+```python
+response = await client.messages.create(
+    model="claude-sonnet-4.5",
+    max_tokens=4000,
+    temperature=0.7,
+    system="You are an expert code reviewer.",
+    messages=[
+        {"role": "user", "content": "Review this code..."}
+    ]
+)
+```
+
+## When in Doubt
+
+- Check `agents.md` for architecture patterns
+- Check `claude.md` for Claude-specific details
+- Check `examples/` for usage examples
+- Check `agent_configs/` for configuration examples
+- Prioritize clarity and safety over cleverness
+
+---
+
+Follow these rules to maintain consistency and quality across the AI agent project.
