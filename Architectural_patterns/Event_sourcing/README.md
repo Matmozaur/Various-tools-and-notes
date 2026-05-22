@@ -1,5 +1,9 @@
 # Event Sourcing (Small Distributed Example)
 
+Event sourcing records every state change as an immutable event, then derives current state by replaying those events into a read model. This keeps the write side append-only and auditable, while projections can be rebuilt or expanded without changing the event log.
+
+![Event sourcing pattern](image.png)
+
 **Services**
 - `command_api`: accepts commands, publishes events to Kafka.
 - `event_store`: consumes events, appends them to Postgres.
