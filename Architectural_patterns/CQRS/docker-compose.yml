@@ -1,0 +1,47 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: cqrs-redis
+    ports:
+      - "6379:6379"
+
+  command-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: cqrs-command-service
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - SERVICE_NAME=command-service
+    command: uvicorn services.command_service.app:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+
+  query-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: cqrs-query-service
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - SERVICE_NAME=query-service
+    command: uvicorn services.query_service.app:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+    depends_on:
+      - redis
+
+  projector-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: cqrs-projector-service
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PROJECTOR_DELAY_MS=300
+      - SERVICE_NAME=projector-service
+    command: python -m services.projector_service.app
+    depends_on:
+      - redis
