@@ -1,0 +1,98 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: saga-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./services/postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+
+  redis:
+    image: redis:7-alpine
+    container_name: saga-redis
+    ports:
+      - "6379:6379"
+
+  order-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: saga-order-service
+    environment:
+      POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/orders_db
+      REDIS_URL: redis://redis:6379/0
+      ORCHESTRATOR_URL: http://orchestrator-service:8001
+    command: uvicorn services.order_service.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+
+  orchestrator-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: saga-orchestrator-service
+    environment:
+      ORDER_SERVICE_URL: http://order-service:8000
+      PAYMENT_SERVICE_URL: http://payment-service:8002
+      INVENTORY_SERVICE_URL: http://inventory-service:8003
+      SHIPPING_SERVICE_URL: http://shipping-service:8004
+    command: uvicorn services.orchestrator_service.app:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - order-service
+      - payment-service
+      - inventory-service
+      - shipping-service
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: saga-payment-service
+    environment:
+      POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/payments_db
+      REDIS_URL: redis://redis:6379/0
+    command: uvicorn services.payment_service.app:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+    depends_on:
+      - postgres
+      - redis
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: saga-inventory-service
+    environment:
+      POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/inventory_db
+      REDIS_URL: redis://redis:6379/0
+    command: uvicorn services.inventory_service.app:app --host 0.0.0.0 --port 8003
+    ports:
+      - "8003:8003"
+    depends_on:
+      - postgres
+      - redis
+
+  shipping-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: saga-shipping-service
+    environment:
+      POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/shipping_db
+      REDIS_URL: redis://redis:6379/0
+    command: uvicorn services.shipping_service.app:app --host 0.0.0.0 --port 8004
+    ports:
+      - "8004:8004"
+    depends_on:
+      - postgres
+      - redis
