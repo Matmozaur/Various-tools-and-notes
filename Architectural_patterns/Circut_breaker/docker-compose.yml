@@ -1,0 +1,28 @@
+services:
+  gateway-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: circuit-breaker-gateway-service
+    environment:
+      - DOWNSTREAM_URL=http://downstream-service:8002/work
+      - REQUEST_TIMEOUT_SECONDS=1.5
+      - FAILURE_THRESHOLD=3
+      - RECOVERY_TIMEOUT_SECONDS=5
+      - SERVICE_NAME=gateway-service
+    command: uvicorn services.gateway_service.app:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - downstream-service
+
+  downstream-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: circuit-breaker-downstream-service
+    environment:
+      - SERVICE_NAME=downstream-service
+    command: uvicorn services.downstream_service.app:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
