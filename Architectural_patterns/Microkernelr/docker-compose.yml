@@ -1,0 +1,37 @@
+services:
+  core-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: microkernelr-core-service
+    environment:
+      - SERVICE_NAME=core-service
+      - PLUGIN_URLS=http://plugin-tax-service:8002,http://plugin-discount-service:8003
+    command: uvicorn services.core_service.app:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - plugin-tax-service
+      - plugin-discount-service
+
+  plugin-tax-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: microkernelr-plugin-tax-service
+    environment:
+      - SERVICE_NAME=plugin-tax-service
+    command: uvicorn services.plugin_tax_service.app:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+
+  plugin-discount-service:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    container_name: microkernelr-plugin-discount-service
+    environment:
+      - SERVICE_NAME=plugin-discount-service
+    command: uvicorn services.plugin_discount_service.app:app --host 0.0.0.0 --port 8003
+    ports:
+      - "8003:8003"
