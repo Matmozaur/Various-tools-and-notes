@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Protocol
+from typing import Iterable, Protocol
 
 
 # Commands (intent)
@@ -48,7 +48,7 @@ class Event(Protocol):
 
 class EventStore:
     def __init__(self) -> None:
-        self._events: List[Event] = []
+        self._events: list[Event] = []
 
     def append(self, event: Event) -> None:
         self._events.append(event)
@@ -80,7 +80,7 @@ class Account:
         elif isinstance(event, MoneyWithdrawn):
             self.balance -= event.amount
 
-    def handle(self, command: object) -> List[Event]:
+    def handle(self, command: object) -> list[Event]:
         if isinstance(command, OpenAccount):
             return [AccountOpened(command.account_id, command.owner)]
         if isinstance(command, DepositMoney):

@@ -1,7 +1,6 @@
 import contextlib
 import sqlite3
 from dataclasses import dataclass
-from typing import Optional
 
 
 @contextlib.contextmanager
@@ -14,7 +13,7 @@ def connect(db_path: str):
 class Post:
     title: str
     content: str
-    id: Optional[int] = None
+    id: int | None = None
 
     @classmethod
     def create_table(cls, db_path: str) -> None:

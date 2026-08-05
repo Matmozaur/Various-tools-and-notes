@@ -1,11 +1,9 @@
-import typing
-
 from after import Post
 from repository import Repository
 
 
 class MockPostRepository(Repository[Post]):
-    def __init__(self, posts: typing.Optional[dict[int, Post]] = None):
+    def __init__(self, posts: dict[int, Post] | None = None):
         self.posts = posts or {}
 
     def get(self, id_: int) -> Post:

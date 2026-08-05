@@ -1,6 +1,5 @@
 import asyncio
 from dataclasses import dataclass
-from typing import Optional
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -26,11 +25,11 @@ class TravelDeps:
 
 
 class TripContext(BaseModel):
-    destination: Optional[str] = None
-    from_city: Optional[str] = None
-    arrival_time: Optional[str] = None
-    hotel_name: Optional[str] = None
-    hotel_location: Optional[str] = None
+    destination: str | None = None
+    from_city: str | None = None
+    arrival_time: str | None = None
+    hotel_name: str | None = None
+    hotel_location: str | None = None
 
 
 # ----------------------------------

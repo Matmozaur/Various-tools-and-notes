@@ -1,5 +1,4 @@
 from functools import partial, reduce, lru_cache
-from typing import List
 
 # 1. Partial: Create a new function with some arguments already pre-filled
 def power(base, exponent):
