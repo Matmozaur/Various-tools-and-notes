@@ -1,6 +1,6 @@
 import logging
 import sqlite3
-from typing import Any, Optional
+from typing import Any
 
 logging.basicConfig(level=logging.INFO)
 
@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 class DBConnectionHandler:
     def __init__(self, db_name: str):
         self.db_name: str = db_name
-        self.connection: Optional[sqlite3.Connection] = None
+        self.connection: sqlite3.Connection | None = None
 
     def __enter__(self) -> sqlite3.Connection:
         self.connection = sqlite3.connect(self.db_name)
@@ -17,9 +17,9 @@ class DBConnectionHandler:
 
     def __exit__(
         self,
-        exc_type: Optional[type],
-        exc_val: Optional[Exception],
-        exc_tb: Optional[Any],
+        exc_type: type | None,
+        exc_val: Exception | None,
+        exc_tb: Any | None,
     ) -> None:
         assert self.connection is not None
         self.connection.close()
@@ -65,8 +65,8 @@ class Repository:
 class UnitOfWork:
     def __init__(self, db_name: str = "example.db"):
         self.db_name: str = db_name
-        self.connection: Optional[sqlite3.Connection] = None
-        self.repository: Optional[Repository] = None
+        self.connection: sqlite3.Connection | None = None
+        self.repository: Repository | None = None
 
     def __enter__(self) -> "UnitOfWork":
         self.connection = sqlite3.connect(self.db_name)
@@ -77,9 +77,9 @@ class UnitOfWork:
 
     def __exit__(
         self,
-        exc_type: Optional[type],
-        exc_val: Optional[Exception],
-        exc_tb: Optional[Any],
+        exc_type: type | None,
+        exc_val: Exception | None,
+        exc_tb: Any | None,
     ) -> None:
         assert self.connection is not None
         if exc_val:

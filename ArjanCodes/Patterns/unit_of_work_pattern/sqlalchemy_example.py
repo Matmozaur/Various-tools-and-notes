@@ -1,5 +1,4 @@
 import contextlib
-from typing import Optional
 
 from sqlalchemy import ForeignKey, String, create_engine
 from sqlalchemy.orm import (
@@ -62,8 +61,8 @@ class UserPreference(Base):
 def create_user(
     session: Session,
     name: str,
-    details: Optional[str] = None,
-    preferences: Optional[str] = None,
+    details: str | None = None,
+    preferences: str | None = None,
 ) -> User:
     user = User(name=name)
     if details:
@@ -77,11 +76,11 @@ def create_user(
 def update_user(
     session: Session,
     user_id: int,
-    name: Optional[str] = None,
-    details: Optional[str] = None,
-    preferences: Optional[str] = None,
+    name: str | None = None,
+    details: str | None = None,
+    preferences: str | None = None,
 ) -> User:
-    user: Optional[User] = session.get(User, user_id)
+    user: User | None = session.get(User, user_id)
     if not user:
         raise ValueError(f"User {user_id} not found")
     if name:
@@ -100,7 +99,7 @@ def update_user(
 
 
 def delete_user(session: Session, user_id: int) -> None:
-    user: Optional[User] = session.get(User, user_id)
+    user: User | None = session.get(User, user_id)
     if not user:
         raise ValueError(f"User {user_id} not found")
     session.delete(user)
