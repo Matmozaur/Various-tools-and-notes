@@ -1,0 +1,19 @@
+[project]
+name = "ml-related-tools"
+version = "0.1.0"
+description = "Scratch environment for ML tooling experiments (langgraph, polars, pytorch, marimo)."
+requires-python = ">=3.14"
+dependencies = [
+    "langgraph==1.2.11",
+    "polars==1.44.2",
+    "torch==2.14.0",
+    "marimo==0.24.0",
+    "numpy==2.5.3",
+]
+
+[tool.uv]
+# torch on Windows: only CPU wheels are on PyPI for cp314 right now.
+
+[tool.marimo.display]
+# "dark" | "light" | "system"
+theme = "dark"
