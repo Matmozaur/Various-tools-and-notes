@@ -1,4 +1,3 @@
-from typing import Optional
 
 import uvicorn
 from fastapi import FastAPI, Query
@@ -12,10 +11,10 @@ class Video(BaseModel):
     title: str
     channel: str
     duration: str
-    description: Optional[str]
-    views: Optional[str]
+    description: str | None
+    views: str | None
     url: str
-    publish_time: Optional[str]
+    publish_time: str | None
 
 
 @app.get("/videos", response_model=list[Video])

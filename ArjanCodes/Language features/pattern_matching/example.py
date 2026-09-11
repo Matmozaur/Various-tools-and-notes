@@ -3,7 +3,6 @@ Example application showing Python 3.10 structural pattern matching.
 """
 
 from dataclasses import dataclass
-from typing import List
 
 
 def run_command_v1(command: str) -> None:
@@ -50,7 +49,7 @@ class Command:
     """Class that represents a command."""
     
     command: str
-    arguments: List[str]
+    arguments: list[str]
 
 def run_command_v4(command: Command) -> None:
     match command:

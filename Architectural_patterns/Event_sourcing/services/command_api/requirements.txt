@@ -1,4 +1,4 @@
-fastapi
-kafka-python
-pydantic
-uvicorn[standard]
+fastapi==0.141.1
+kafka-python==3.0.10
+pydantic==2.13.4
+uvicorn[standard]==0.52.1
