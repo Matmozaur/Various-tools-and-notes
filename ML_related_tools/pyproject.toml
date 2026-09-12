@@ -9,6 +9,7 @@ dependencies = [
     "torch==2.14.0",
     "marimo==0.24.0",
     "numpy==2.5.3",
+    "pydantic-ai>=2.43.0",
 ]
 
 [tool.uv]
