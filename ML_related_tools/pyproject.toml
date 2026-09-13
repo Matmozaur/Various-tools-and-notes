@@ -10,6 +10,9 @@ dependencies = [
     "marimo==0.24.0",
     "numpy==2.5.3",
     "pydantic-ai>=2.43.0",
+    "transformers>=5.17.0",
+    "scikit-learn>=1.9.1",
+    "matplotlib>=3.11.2",
 ]
 
 [tool.uv]
