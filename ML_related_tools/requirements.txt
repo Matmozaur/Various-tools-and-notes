@@ -33,6 +33,12 @@ authlib==1.8.0
     # via fastmcp-slim
 beartype==0.22.9
     # via py-key-value-aio
+boto3==1.43.102
+    # via metaflow
+botocore==1.43.102
+    # via
+    #   boto3
+    #   s3transfer
 cachetools==7.1.8
     # via py-key-value-aio
 caio==0.12.4
@@ -173,6 +179,10 @@ jiter==0.17.0
     # via
     #   anthropic
     #   openai
+jmespath==1.1.0
+    # via
+    #   boto3
+    #   botocore
 joblib==1.6.0
     # via scikit-learn
 joserfc==1.7.5
@@ -239,6 +249,8 @@ mcp-types==2.2.0
     #   mcp
 mdurl==0.1.2
     # via markdown-it-py
+metaflow==2.19.39
+    # via ml-related-tools
 more-itertools==11.1.0
     # via
     #   jaraco-classes
@@ -426,7 +438,9 @@ pyparsing==3.3.2
 pyperclip==1.11.0
     # via pydantic-ai-slim
 python-dateutil==2.9.0.post0
-    # via matplotlib
+    # via
+    #   botocore
+    #   matplotlib
 python-dotenv==1.2.3
     # via
     #   fastmcp-slim
@@ -463,6 +477,7 @@ requests==2.34.2
     #   google-auth
     #   google-genai
     #   langsmith
+    #   metaflow
     #   opentelemetry-exporter-otlp-proto-http
     #   requests-toolbelt
     #   tiktoken
@@ -479,6 +494,8 @@ rpds-py==2026.6.3
     # via
     #   jsonschema
     #   referencing
+s3transfer==0.19.2
+    # via boto3
 safetensors==0.8.0
     # via transformers
 scikit-learn==1.9.1
@@ -569,7 +586,9 @@ typing-inspection==0.4.4
     #   pydantic-graph
     #   pydantic-settings
 urllib3==2.7.0
-    # via requests
+    # via
+    #   botocore
+    #   requests
 uuid-utils==0.17.1
     # via
     #   langchain-core

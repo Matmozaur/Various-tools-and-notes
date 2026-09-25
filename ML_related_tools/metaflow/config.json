@@ -1,0 +1,26 @@
+{
+  "data": {
+    "dataset": "breast_cancer",
+    "profile_top_k": 8
+  },
+  "cv": {
+    "folds": 3
+  },
+  "models": [
+    {"name": "logreg_c1", "family": "logreg", "params": {"C": 1.0}},
+    {"name": "logreg_c0.05", "family": "logreg", "params": {"C": 0.05}},
+    {"name": "rf_200", "family": "random_forest", "params": {"n_estimators": 200, "max_depth": 6}},
+    {"name": "gbm_100", "family": "gradient_boosting", "params": {"n_estimators": 100, "learning_rate": 0.1}},
+    {"name": "knn_15", "family": "knn", "params": {"n_neighbors": 15}}
+  ],
+  "promotion": {
+    "min_accuracy": 0.95
+  },
+  "training": {
+    "retries": 2,
+    "timeout_seconds": 120,
+    "cpu": 1,
+    "memory_mb": 2048
+  },
+  "time_every_step": true
+}

@@ -3,6 +3,14 @@
 #
 # Requires: uv on PATH, and GNU make run through a POSIX shell (git-bash) for `clean`.
 # Every other target is a plain `uv` call and works from any shell.
+#
+# WSL/Linux: the same project is used, but ./.venv is the *Windows* venv (shared folder),
+# so on Linux the env lives in ~/.venvs/ml-related-tools instead, and uv uses its own
+# managed Python (ignores pyenv shims / system Python). Needed e.g. for metaflow/.
+ifeq ($(shell uname -s 2>/dev/null),Linux)
+export UV_PROJECT_ENVIRONMENT ?= $(HOME)/.venvs/ml-related-tools
+export UV_PYTHON_PREFERENCE ?= only-managed
+endif
 
 .DEFAULT_GOAL := help
 .PHONY: help install sync upgrade lock export run python marimo notebook check clean
@@ -45,4 +53,4 @@ print('langgraph', m.version('langgraph')); \
 print('marimo ', m.version('marimo'))"
 
 clean: ## Remove the virtual environment
-	rm -rf .venv
+	rm -rf $${UV_PROJECT_ENVIRONMENT:-.venv}
